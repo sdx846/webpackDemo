@@ -1,7 +1,7 @@
 const path = require('path')
 //用于获取文件内容
 const fs = require('fs')
-//@babel/parser将获取到的模块内容,解析成AST语法树。有三个api,下面的parse这个API将我们提供的代码解析成完整的ECMAScript代码
+//@babel/parser将获取到的模块内容,解析成AST语法树。
 const parser = require('@babel/parser')
 //遍历AST，将用到的依赖收集起来。其实就是将用import语句引入的文件路径收集起来。我们将收集起来的路径放到deps里。
 const traverse = require('@babel/traverse').default
@@ -11,6 +11,7 @@ const babel = require('@babel/core')
 
 const getModuleInfo = (file) => {
     const body = fs.readFileSync(file, 'utf-8');//获取模块文件内容
+    //parse这个API将我们提供的代码解析成AST抽象语法树。将源代码转化为AST后，可以对AST做很多的操作。
     const ast = parser.parse(body, {
         sourceType: 'module' //表示我们要解析的是ES模块
     });
@@ -26,7 +27,7 @@ const getModuleInfo = (file) => {
             deps[node.source.value] = abspath
         }
     })
-    // console.log(deps);
+    //console.log(deps);//{ './add': './src/add.js', './minus': './src/minus.js' }
     //transformFromAst将我们传入的AST转化成我们在第三个参数里配置的模块类型。
     const {code} = babel.transformFromAst(ast,null,{
         presets:["@babel/preset-env"]
